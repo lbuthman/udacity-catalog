@@ -1,57 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Exericse Catalog</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional Bootstrap theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-    <!-- Font Awesome -->
-    <script src="https://use.fontawesome.com/a4ac4f61f2.js"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,500,700" rel="stylesheet">
-    <!-- Bootstrap and JQuery JavaScript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename=
-        'styles.css')}}">
-</head>
-<body>
-    {% include "header.html" %}
-    <main class="container">
-        <article class="row text-center">
-            <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2">
-                <h1>Welcome to the Exercise Instruction Catalog!</h1>
-                <hr>
-            </div>
-            <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2">
-                <h3>Let's get started!</h3>
-            </div>
-            <div class="col-xs-6">
-                <h3>Choose a category</h3>
-                {% for category in categories %}
-                <h3><a href="{{url_for('view_goal', goal=category.name)}}">
-                    {{category.name}}</a></h3>
-                {% endfor %}
-            </div>
-            <div class="col-xs-6 vertical-line">
-                <h3>Recently Added Exercises</h3>
-                {% for exercise in exercises %}
-                {% with id = exercise.category_id %}
-                <h3>{{exercise.name}}</h3>
-                <h4>{{get_category(id)}}
-                {% endwith %}
-                {% endfor %}
-            </div>
-        </article>
-    </main>
-    {% include "footer.html" %}
-</body>
-</html>
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<article class="row text-center">
+    <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2">
+        <h1>Welcome to the Exercise Instruction Catalog!</h1>
+        <hr>
+    </div>
+    <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2">
+        <h3>Let's get started!</h3>
+    </div>
+    <div class="col-xs-6">
+        <h3>Choose a category</h3>
+        {% for category in categories %}
+        <h3><a href="{{url_for('view_goal', goal=category.name)}}">
+            {{category.name}}</a>
+        </h3>
+        {% endfor %}
+    </div>
+    <div class="col-xs-6 vertical-line">
+        <h3>Recently Added Exercises</h3>
+        {% for exercise in exercises %}
+        {% with id = exercise.category_id %}
+        <h3><a href="{{url_for('view_exercise', goal=get_category(id),
+            exercise=exercise.name)}}">{{exercise.name}}</a>
+        </h3>
+        {% endwith %}
+        {% endfor %}
+    </div>
+</article>
+
+{% include "footer.html" %}
+{% endblock %}

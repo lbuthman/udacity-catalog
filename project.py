@@ -58,7 +58,7 @@ def delete_exercise(goal, exercise):
     return render_template("delete-exercise.html")
 
 def get_category(category_id):
-    return "category name"
+    return CATEGORIES[0]['name']
 
 app.jinja_env.globals.update(get_category=get_category)
 
