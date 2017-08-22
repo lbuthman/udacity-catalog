@@ -19,7 +19,7 @@ session = DBSession()
 @app.route('/index.html/')
 def index():
     categories = session.query(Category)
-    exercises = session.query(Exercise).order_by(desc(Exercise.id))
+    exercises = session.query(Exercise).order_by(desc(Exercise.id)).limit(10).all()
     return render_template("index.html", categories=categories,
         exercises=exercises)
 
