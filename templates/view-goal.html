@@ -2,8 +2,14 @@
 {% block content %}
 {% include "header.html" %}
 
-<article class="row"
-    <p>"Returns all workouts for a certain goal."</p>
+<article class="row">
+    <p>{{category.name}}</p>
+    {% for exercise in exercises %}
+    <p>{{exercise.name}}</p>
+    <p>{{exercise.url}}</p>
+    <p>{{exercise.description}}</p>
+    <br/>
+    {% endfor %}
 </article>
 {% include "footer.html" %}
 {% endblock %}

@@ -31,7 +31,9 @@ def login():
 @app.route('/<goal>')
 @app.route('/<goal>/')
 def view_goal(goal):
-    return render_template("view-goal.html")
+    category = session.query(Category).filter_by(name=goal).one()
+    exercises = session.query(Exercise).filter_by(category=category).all()
+    return render_template("view-goal.html", category=category, exercises=exercises)
 
 @app.route('/<goal>/<exercise>')
 @app.route('/<goal>/<exercise>/')
