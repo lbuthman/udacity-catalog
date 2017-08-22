@@ -28,16 +28,16 @@ def index():
 def login():
     return render_template("login.html")
 
-@app.route('/<goal>')
-@app.route('/<goal>/')
-def view_goal(goal):
-    category = session.query(Category).filter_by(name=goal).one()
+@app.route('/<category>')
+@app.route('/<category>/')
+def view_category(category):
+    category = session.query(Category).filter_by(name=category).one()
     exercises = session.query(Exercise).filter_by(category=category).all()
-    return render_template("view-goal.html", category=category, exercises=exercises)
+    return render_template("view-category.html", category=category, exercises=exercises)
 
-@app.route('/<goal>/<exercise>')
-@app.route('/<goal>/<exercise>/')
-def view_exercise(goal, exercise):
+@app.route('/<category>/<exercise>')
+@app.route('/<category>/<exercise>/')
+def view_exercise(category, exercise):
     return render_template("view-exercise.html")
 
 @app.route('/how-it-works')
@@ -45,19 +45,19 @@ def view_exercise(goal, exercise):
 def how_it_works():
     return render_template("how-it-works.html")
 
-@app.route('/<goal>/new')
-@app.route('/<goal>/new/')
-def new_exercise(goal):
+@app.route('/<category>/new')
+@app.route('/<category>/new/')
+def new_exercise(category):
     return render_template("new-exercise.html")
 
-@app.route('/<goal>/<exercise>/edit')
-@app.route('/<goal>/<exercise>/edit/')
-def edit_exercise(goal, exercise):
+@app.route('/<category>/<exercise>/edit')
+@app.route('/<category>/<exercise>/edit/')
+def edit_exercise(category, exercise):
     return render_template("edit-exercise.html")
 
-@app.route('/<goal>/<exercise>/delete')
-@app.route('/<goal>/<exercise>/delete/')
-def delete_exercise(goal, exercise):
+@app.route('/<category>/<exercise>/delete')
+@app.route('/<category>/<exercise>/delete/')
+def delete_exercise(category, exercise):
     return render_template("delete-exercise.html")
 
 def get_category(category_id):
