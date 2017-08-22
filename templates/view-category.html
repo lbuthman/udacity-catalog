@@ -2,13 +2,24 @@
 {% block content %}
 {% include "header.html" %}
 
-<article class="row">
-    <p>{{category.name}}</p>
-    {% for exercise in exercises %}
-    <p>{{exercise.name}}</p>
-    <p>{{exercise.url}}</p>
-    <p>{{exercise.description}}</p>
+<article class="row text-center">
+    <h2>{{category.name}}</h2>
+    <hr/>
     <br/>
+    {% for exercise in exercises %}
+    <div class="col-xs-12 col-sm-6">
+        <div>
+            <p>{{exercise.name}}</p>
+        </div>
+        <div class="embed-responsive embed-responsive-4by3">
+          <iframe class="embed-responsive-item" src="{{exercise.url}}"></iframe>
+        </div>
+        <div>
+            <p>{{exercise.description}}</p>
+        </div>
+        <hr/>
+        <br/>
+    </div>
     {% endfor %}
 </article>
 {% include "footer.html" %}
