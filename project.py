@@ -14,13 +14,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-EXERCISES = [{'id': '1', 'name':'Kettlebell Swings', 'category_id':'2',
-    'url':'https://www.youtube.com/watch?v=-KqxcDijOyA', 'description':"""
-    A simple tool to add strength and build the posterior chain."""},
-    {'id': '2', 'name':'Running', 'category_id':'1',
-    'url':'https://www.youtube.com/watch?v=8XiwtiDTlYU', 'description':"""
-    Classic exercise that few know with proper technique."""}]
-
 @app.route('/')
 @app.route('/index.html')
 @app.route('/index.html/')
