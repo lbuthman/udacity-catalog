@@ -3,24 +3,43 @@
 {% include "header.html" %}
 
 <article class="row text-center">
-    <h2>{{category.name}}</h2>
-    <hr/>
-    <br/>
+    <div>
+        <h2>{{category.name}} Category</h2>
+        <hr/>
+    </div>
+
     {% for exercise in exercises %}
     <div class="col-xs-12 col-sm-6">
         <div>
-            <p>{{exercise.name}}</p>
+            <h3>{{exercise.name}}</h3>
         </div>
         <div class="embed-responsive embed-responsive-4by3">
           <iframe class="embed-responsive-item" src="{{exercise.url}}"></iframe>
         </div>
         <div>
-            <p>{{exercise.description}}</p>
+            <h4>{{exercise.description}}</h4>
         </div>
         <hr/>
         <br/>
     </div>
     {% endfor %}
+
+    <div class="col-xs-12 col-sm-6">
+        <div>
+            <h3>Add New Exercise</h3>
+        </div>
+        <div class="embed-responsive embed-responsive-4by3">
+          <a href="{{url_for('new_exercise', category=category.name)}}">
+            <img class="embed-responsive-item"
+                src="{{url_for('static', filename='add_new.png')}}"></img></a>
+        </div>
+        <div>
+            <h4>Click above to make a new Exercise. Let's do this!</h4>
+        </div>
+        <hr/>
+        <br/>
+    </div>
+
 </article>
 {% include "footer.html" %}
 {% endblock %}
