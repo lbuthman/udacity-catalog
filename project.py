@@ -15,7 +15,6 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 @app.route('/')
-@app.route('/index.html')
 @app.route('/index.html/')
 def index():
     categories = session.query(Category)
@@ -23,39 +22,32 @@ def index():
     return render_template("index.html", categories=categories,
         exercises=exercises)
 
-@app.route('/login')
 @app.route('/login/')
 def login():
     return render_template("login.html")
 
-@app.route('/<category>')
 @app.route('/<category>/')
 def view_category(category):
     category = session.query(Category).filter_by(name=category).first()
     exercises = session.query(Exercise).filter_by(category=category).all()
     return render_template("view-category.html", category=category, exercises=exercises)
 
-@app.route('/<category>/<exercise>')
 @app.route('/<category>/<exercise>/')
 def view_exercise(category, exercise):
     return render_template("view-exercise.html")
 
-@app.route('/how-it-works')
 @app.route('/how-it-works/')
 def how_it_works():
     return render_template("how-it-works.html")
 
-@app.route('/<category>/new')
 @app.route('/<category>/new/')
 def new_exercise(category):
     return render_template("new-exercise.html")
 
-@app.route('/<category>/<exercise>/edit')
 @app.route('/<category>/<exercise>/edit/')
 def edit_exercise(category, exercise):
     return render_template("edit-exercise.html")
 
-@app.route('/<category>/<exercise>/delete')
 @app.route('/<category>/<exercise>/delete/')
 def delete_exercise(category, exercise):
     return render_template("delete-exercise.html")
