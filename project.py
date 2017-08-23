@@ -35,11 +35,6 @@ def view_category(category):
     exercises = session.query(Exercise).filter_by(category=category).all()
     return render_template("view-category.html", category=category, exercises=exercises)
 
-@app.route('/<category>/<exercise>')
-@app.route('/<category>/<exercise>/')
-def view_exercise(category, exercise):
-    return render_template("view-exercise.html")
-
 @app.route('/how-it-works')
 @app.route('/how-it-works/')
 def how_it_works():
