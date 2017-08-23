@@ -35,23 +35,28 @@ def view_category(category):
     exercises = session.query(Exercise).filter_by(category=category).all()
     return render_template("view-category.html", category=category, exercises=exercises)
 
+@app.route('/<category>/<exercise>')
+@app.route('/<category>/<exercise>/')
+def view_exercise(category, exercise):
+    return render_template("view-exercise.html")
+
 @app.route('/how-it-works')
 @app.route('/how-it-works/')
 def how_it_works():
     return render_template("how-it-works.html")
 
-@app.route('/<category>/new', methods=['GET', 'POST'])
-@app.route('/<category>/new/', methods=['GET', 'POST'])
+@app.route('/<category>/new')
+@app.route('/<category>/new/')
 def new_exercise(category):
     return render_template("new-exercise.html")
 
-@app.route('/<category>/<exercise>/edit', methods=['GET', 'POST'])
-@app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
+@app.route('/<category>/<exercise>/edit')
+@app.route('/<category>/<exercise>/edit/')
 def edit_exercise(category, exercise):
     return render_template("edit-exercise.html")
 
-@app.route('/<category>/<exercise>/delete', methods=['GET', 'POST'])
-@app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
+@app.route('/<category>/<exercise>/delete')
+@app.route('/<category>/<exercise>/delete/')
 def delete_exercise(category, exercise):
     return render_template("delete-exercise.html")
 
