@@ -31,7 +31,7 @@ def login():
 @app.route('/<category>')
 @app.route('/<category>/')
 def view_category(category):
-    category = session.query(Category).filter_by(name=category).one()
+    category = session.query(Category).filter_by(name=category).first()
     exercises = session.query(Exercise).filter_by(category=category).all()
     return render_template("view-category.html", category=category, exercises=exercises)
 
