@@ -11,7 +11,8 @@
     {% for exercise in exercises %}
     <div class="col-xs-12 col-sm-6">
         <div>
-            <h3>{{exercise.name}}</h3>
+            <h3><a href="{{url_for('view_exercise', category=category.name,
+                exercise=exercise.name)}}">{{exercise.name}}</a></h3>
         </div>
         <div class="embed-responsive embed-responsive-4by3">
           <iframe class="embed-responsive-item" src="{{exercise.url}}"></iframe>
