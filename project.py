@@ -40,18 +40,18 @@ def view_category(category):
 def how_it_works():
     return render_template("how-it-works.html")
 
-@app.route('/<category>/new')
-@app.route('/<category>/new/')
+@app.route('/<category>/new', methods=['GET', 'POST'])
+@app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
     return render_template("new-exercise.html")
 
-@app.route('/<category>/<exercise>/edit')
-@app.route('/<category>/<exercise>/edit/')
+@app.route('/<category>/<exercise>/edit', methods=['GET', 'POST'])
+@app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
     return render_template("edit-exercise.html")
 
-@app.route('/<category>/<exercise>/delete')
-@app.route('/<category>/<exercise>/delete/')
+@app.route('/<category>/<exercise>/delete', methods=['GET', 'POST'])
+@app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
     return render_template("delete-exercise.html")
 
