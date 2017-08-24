@@ -45,7 +45,33 @@ def how_it_works():
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
-    return render_template("new-exercise.html")
+    category = session.query(Category).filter_by(name=category).first()
+    name = ""
+    description = ""
+    url = ""
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        url = request.form['url']
+        if name == "" or description == "" or url == "":
+            flash("All fields are required. Please check and try again", 'danger')
+            return render_template("new-exercise.html", category=category,
+                name=name, description=description, url=url)
+        elif "embed" not in url:
+            flash("""Uh oh! Double check the url and make sure you use the
+                embedded version.""", 'warning')
+            return render_template("new-exercise.html", category=category,
+                name=name, description=description, url=url)
+        else:
+            newExercise = Exercise(name=name, description=description, url=url,
+                category=category)
+            session.add(newExercise)
+            session.commit()
+            flash("Sweet to the beat! You successful added an exercise!")
+            return redirect(url_for("view_category", category=category.name))
+    else:
+        return render_template("new-exercise.html", category=category, name=name,
+            description=description, url=url)
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):

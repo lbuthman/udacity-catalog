@@ -2,7 +2,65 @@
 {% block content %}
 {% include "header.html" %}
 <article class="row">
-    <p>"Let logged in user create a new exercise"</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Categories: success (green), info (blue), warning (yellow), danger (red)-->
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible text-center" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{message}}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div>
+        <h2>Add a New Exercise in "{{category.name}}"</h2>
+        <hr/>
+    </div>
+
+    <div>
+        <form action="{{url_for('new_exercise', category=category.name)}}" method="POST">
+            <div class="input-group col-xs-4">
+                <span class="input-group-addon" id="name">Name:</span>
+                <input name="name" type="text" class="form-control" aria-describedby="name"
+                    placeholder="ex. Really Rad Name" value="{{name}}">
+            </div>
+            <br>
+
+            <div class="input-group col-xs-12">
+                <span class="input-group-addon" id="description">Description:</span>
+                <input name="description" type="text" class="form-control" aria-describedby="description"
+                    placeholder="ex. it's great because ..." value="{{description}}">
+            </div>
+            <br>
+
+            <div class="input-group col-xs-6">
+                <span class="input-group-addon" id="url">Embedded URL:</span>
+                <input name="url" type="text" class="form-control" aria-describedby="url"
+                    placeholder="Tip: use YouTube's Share Embed url" value="{{url}}">
+            </div>
+            <br>
+
+            <div>
+                <button type="submit" class="btn btn-default">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save
+                </button>
+            </div>
+            <br>
+        </form>
+
+        <div>
+            <a href="{{url_for('view_category', category=category.name)}}">
+                <button class="btn btn-default delete">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true">
+                    </span>Cancel
+                </button>
+            </a>
+        </div>
+    </div>
 </article>
 {% include "footer.html" %}
 {% endblock %}
