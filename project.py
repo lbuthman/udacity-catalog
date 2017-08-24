@@ -53,6 +53,10 @@ def edit_exercise(category, exercise):
     categories = session.query(Category).all()
     editedExercise = session.query(Exercise).filter_by(name=exercise).first()
     if request.method == 'POST':
+        editedExercise.name = request.form['name']
+        editedExercise.description = request.form['description']
+        editedExercise.url = request.form['url']
+        flash("Exercise {} has been edited.".format(editedExercise.name))
         return redirect(url_for("view_exercise", category=category.name,
             exercise=editedExercise.name))
     else:
