@@ -49,7 +49,15 @@ def new_exercise(category):
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
-    return render_template("edit-exercise.html")
+    category = session.query(Category).filter_by(name=category).first()
+    categories = session.query(Category).all()
+    editedExercise = session.query(Exercise).filter_by(name=exercise).first()
+    if request.method == 'POST':
+        return redirect(url_for("view_exercise", category=category.name,
+            exercise=editedExercise.name))
+    else:
+        return render_template("edit-exercise.html", category=category,
+            categories=categories, exercise=editedExercise)
 
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
