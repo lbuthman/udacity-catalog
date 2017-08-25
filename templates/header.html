@@ -1,11 +1,15 @@
 <header class="row top-menu">
-	<div class="col-md-6">
-		<a href="{{url_for('index')}}">
-			<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Home
-		</a>
-	</div>
-	<div class="col-md-6 text-right">
-					<p>Login Link will go Here </p>
-
-	</div>
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container-fluid">
+			<div class="navbar-header col-xs-9">
+				<a href="{{url_for('index')}}">
+					<h4><span class="glyphicon glyphicon-home" aria-hidden="true">
+					</span> Catalog Home</h4>
+				</a>
+			</div>
+			<div class="col-xs-3 text-right">
+				<button type="button" class="btn btn-default navbar-btn">Sign in</button>
+			</div>
+		</div>
+	</nav>
 </header>
