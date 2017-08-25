@@ -88,7 +88,7 @@ def edit_exercise(category, exercise):
     else:
         return render_template("edit-exercise.html", category=category,
             categories=categories, exercise=editedExercise)
-
+#
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
     category = session.query(Category).filter_by(name=category).first()
