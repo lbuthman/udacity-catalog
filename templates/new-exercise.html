@@ -30,12 +30,23 @@
             </div>
             <br>
 
+            {% if description == "" %}
+            <div class="input-group col-xs-6">
+                <span class="input-group-addon" id="description">Description:</span>
+                <textarea name="description" type="text" class="form-control" aria-describedby="description"
+                    placeholder="Ex. It's rad because ..." rows="2"></textarea>
+            </div>
+            <br>
+            {% endif %}
+
+            {% if description != "" %}
             <div class="input-group col-xs-6">
                 <span class="input-group-addon" id="description">Description:</span>
                 <textarea name="description" type="text" class="form-control" aria-describedby="description"
                     rows="2">{{description}}</textarea>
             </div>
             <br>
+            {% endif %}
 
             <div class="input-group col-xs-6">
                 <span class="input-group-addon" id="url">Embedded URL:</span>
