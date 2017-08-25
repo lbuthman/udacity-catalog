@@ -91,7 +91,16 @@ def edit_exercise(category, exercise):
 
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
-    return render_template("delete-exercise.html")
+    category = session.query(Category).filter_by(name=category).first()
+    deletedExercise = session.query(Exercise).filter_by(name=exercise).first()
+    if request.method == 'POST':
+        session.delete(deletedExercise)
+        session.commit()
+        flash("Exercise {} has been deleted.".format(deletedExercise.name))
+        return redirect(url_for("view_category", category=category.name))
+    else:
+        return render_template("delete-exercise.html", category=category,
+            exercise=deletedExercise)
 
 def get_category(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
