@@ -244,6 +244,14 @@ def get_category(category_id):
     return category.name
 
 
+def get_user_id(email):
+    try:
+        user = db_session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
 def get_user_info(user_id):
     user = db_session.query(User).filter_by(id=user_id).one()
     return user
