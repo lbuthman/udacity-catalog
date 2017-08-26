@@ -119,7 +119,7 @@ def gconnect():
     output += '<h1>Welcome, '
     output += session['username']
     output += '!</h1>'
-    flash("Welcome {}! You are now logged in and will be redirected.".format(
+    flash("You are in! Feel free to add, edit or delete exercises.".format(
         session['username']), "success")
     return output
 
