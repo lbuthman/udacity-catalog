@@ -208,6 +208,8 @@ def new_exercise(category):
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
+    if 'username' not in session:
+        return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
     categories = db_session.query(Category).all()
     editedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
@@ -224,6 +226,8 @@ def edit_exercise(category, exercise):
 #
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
+    if 'username' not in session:
+        return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
     deletedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
     if request.method == 'POST':
