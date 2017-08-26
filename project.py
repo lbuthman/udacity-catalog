@@ -4,7 +4,7 @@ from flask import session
 from flask import make_response
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Exercise
+from database_setup import Base, Category, Exercise, User
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import random, string
@@ -138,7 +138,6 @@ def gdisconnect():
         del session['access_token']
         del session['gplus_id']
         del session['username']
-        del session['logged_in']
         del session['email']
         # del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
@@ -242,6 +241,13 @@ def delete_exercise(category, exercise):
 def get_category(category_id):
     category = db_session.query(Category).filter_by(id=category_id).one()
     return category.name
+
+def createUser(session):
+    newUser = User(name=session['username'], email=session['email'])
+    db_session.add(newUser)
+    db_session.commit()
+    user = db_session.query(User).filter_by(email=session['email']).one()
+    return user.id
 
 app.jinja_env.globals.update(get_category=get_category)
 
