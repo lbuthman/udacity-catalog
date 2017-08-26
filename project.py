@@ -171,8 +171,12 @@ def view_category(category):
 def view_exercise(category, exercise):
     category = db_session.query(Category).filter_by(name=category).first()
     exercise = db_session.query(Exercise).filter_by(name=exercise).first()
-    return render_template("view-exercise.html", category=category,
-        exercise=exercise)
+    if session['user_id'] == exercise.user_id:
+        return render_template("view-exercise.html", category=category,
+            exercise=exercise)
+    else:
+        return render_template("publicview-exercise.html", category=category,
+            exercise=exercise)
 
 @app.route('/how-it-works/')
 def how_it_works():

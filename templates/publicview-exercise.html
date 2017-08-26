@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<article class="row text-center">
+
+    <div class="col-xs-12">
+        <h2>{{exercise.name}} in {{category.name}}</h2>
+        <hr/>
+    </div>
+
+    <div class="col-xs-10 col-xs-offset-1">
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item"
+                src="{{exercise.url}}"></iframe>
+        </div>
+        <div>
+            <h4>{{exercise.description}}</h4>
+        </div>
+    </div>
+</article>
+{% include "footer.html" %}
+{% endblock %}
