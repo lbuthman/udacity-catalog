@@ -119,9 +119,8 @@ def gconnect():
     output += '<h1>Welcome, '
     output += session['username']
     output += '!</h1>'
-    print(session)
     flash("Welcome {}! You are now logged in and will be redirected.".format(
-        session['username']))
+        session['username']), "success")
     return output
 
 @app.route('/gdisconnect')
@@ -131,7 +130,8 @@ def gdisconnect():
         print('Access Token is None')
         response = make_response(json.dumps('Current user is not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Current user is not connected", "warning")
+        return redirect(url_for("index"))
 
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
     h = httplib2.Http()
@@ -145,12 +145,14 @@ def gdisconnect():
         # del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("You have been Successfully disconnected", "success")
+        return redirect(url_for("index"))
     else:
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-        return response
-
+        flash("Failed to revoke token for given user", "danger")
+        return redirect(url_for("index"))
+#
 @app.route('/')
 @app.route('/index.html/')
 def index():
