@@ -117,7 +117,6 @@ def gconnect():
     output += '!</h1>'
     flash("Welcome {}! You are now logged in and will be redirected.".format(
         login_session['username']))
-    print("DONE!!!!!")
     return output
 
 @app.route('/gdisconnect')
@@ -128,9 +127,11 @@ def gdisconnect():
         response = make_response(json.dumps('Current user is not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
+    
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
@@ -172,6 +173,8 @@ def how_it_works():
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
+    if 'username' not in login_session:
+        return redirect('/login')
     category = session.query(Category).filter_by(name=category).first()
     name = ""
     description = ""
