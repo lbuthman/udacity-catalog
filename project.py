@@ -1,6 +1,6 @@
 from flask import (Flask, render_template, request, redirect, url_for, flash,
 jsonify)
-from flask import session as login_session
+from flask import session
 from flask import make_response
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
@@ -20,20 +20,20 @@ app = Flask(__name__)
 engine = create_engine('sqlite:///exercisecatalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
-session = DBSession()
+db_session = DBSession()
 
 # Create anti-forgery state token
 @app.route('/login/')
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
-    login_session['state'] = state
+    session['state'] = state
     return render_template("login.html", STATE=state)
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if request.args.get('state') != login_session['state']:
+    if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -88,8 +88,8 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    stored_access_token = login_session.get('access_token')
-    stored_gplus_id = login_session.get('gplus_id')
+    stored_access_token = session.get('access_token')
+    stored_gplus_id = session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already connected.'),
                                  200)
@@ -97,8 +97,8 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    login_session['access_token'] = credentials.access_token
-    login_session['gplus_id'] = gplus_id
+    session['access_token'] = credentials.access_token
+    session['gplus_id'] = gplus_id
 
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
@@ -107,37 +107,40 @@ def gconnect():
 
     data = answer.json()
 
-    login_session['username'] = data['name']
-    # login_session['picture'] = data['picture']
-    # login_session['email'] = data['email']
+    session['username'] = data['name']
+    session['logged_in'] = True
+    # session['picture'] = data['picture']
+    # session['email'] = data['email']
 
     output = ''
     output += '<h1>Welcome, '
-    output += login_session['username']
+    output += session['username']
     output += '!</h1>'
+    print(session)
     flash("Welcome {}! You are now logged in and will be redirected.".format(
-        login_session['username']))
+        session['username']))
     return output
 
 @app.route('/gdisconnect')
 def gdisconnect():
-    access_token = login_session.get('access_token')
+    access_token = session.get('access_token')
     if access_token is None:
         print('Access Token is None')
         response = make_response(json.dumps('Current user is not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    
+
     if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        # del login_session['email']
-        # del login_session['picture']
+        del session['access_token']
+        del session['gplus_id']
+        del session['username']
+        del session['logged_in']
+        # del session['email']
+        # del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -149,21 +152,21 @@ def gdisconnect():
 @app.route('/')
 @app.route('/index.html/')
 def index():
-    categories = session.query(Category)
-    exercises = session.query(Exercise).order_by(desc(Exercise.id)).limit(10).all()
+    categories = db_session.query(Category)
+    exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).limit(10).all()
     return render_template("index.html", categories=categories,
         exercises=exercises)
 
 @app.route('/<category>/')
 def view_category(category):
-    category = session.query(Category).filter_by(name=category).first()
-    exercises = session.query(Exercise).filter_by(category=category).all()
+    category = db_session.query(Category).filter_by(name=category).first()
+    exercises = db_session.query(Exercise).filter_by(category=category).all()
     return render_template("view-category.html", category=category, exercises=exercises)
 
 @app.route('/<category>/<exercise>/')
 def view_exercise(category, exercise):
-    category = session.query(Category).filter_by(name=category).first()
-    exercise = session.query(Exercise).filter_by(name=exercise).first()
+    category = db_session.query(Category).filter_by(name=category).first()
+    exercise = db_session.query(Exercise).filter_by(name=exercise).first()
     return render_template("view-exercise.html", category=category,
         exercise=exercise)
 
@@ -173,9 +176,9 @@ def how_it_works():
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
-    if 'username' not in login_session:
+    if 'username' not in session:
         return redirect('/login')
-    category = session.query(Category).filter_by(name=category).first()
+    category = db_session.query(Category).filter_by(name=category).first()
     name = ""
     description = ""
     url = ""
@@ -195,8 +198,8 @@ def new_exercise(category):
         else:
             newExercise = Exercise(name=name, description=description, url=url,
                 category=category)
-            session.add(newExercise)
-            session.commit()
+            db_session.add(newExercise)
+            db_session.commit()
             flash("Sweet to the beat! You successful added an exercise!")
             return redirect(url_for("view_category", category=category.name))
     else:
@@ -205,9 +208,9 @@ def new_exercise(category):
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
-    category = session.query(Category).filter_by(name=category).first()
-    categories = session.query(Category).all()
-    editedExercise = session.query(Exercise).filter_by(name=exercise).first()
+    category = db_session.query(Category).filter_by(name=category).first()
+    categories = db_session.query(Category).all()
+    editedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
     if request.method == 'POST':
         editedExercise.name = request.form['name']
         editedExercise.description = request.form['description']
@@ -221,11 +224,11 @@ def edit_exercise(category, exercise):
 #
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
-    category = session.query(Category).filter_by(name=category).first()
-    deletedExercise = session.query(Exercise).filter_by(name=exercise).first()
+    category = db_session.query(Category).filter_by(name=category).first()
+    deletedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
     if request.method == 'POST':
-        session.delete(deletedExercise)
-        session.commit()
+        db_session.delete(deletedExercise)
+        db_session.commit()
         flash("Exercise {} has been deleted.".format(deletedExercise.name))
         return redirect(url_for("view_category", category=category.name))
     else:
@@ -233,7 +236,7 @@ def delete_exercise(category, exercise):
             exercise=deletedExercise)
 
 def get_category(category_id):
-    category = session.query(Category).filter_by(id=category_id).one()
+    category = db_session.query(Category).filter_by(id=category_id).one()
     return category.name
 
 app.jinja_env.globals.update(get_category=get_category)
