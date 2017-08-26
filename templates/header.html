@@ -7,11 +7,21 @@
 					</span> Catalog Home</h4>
 				</a>
 			</div>
+
+			{% if session['logged_in'] == True %}
+			<div class="col-xs-3 text-right">
+				<a href="{{url_for('gdisconnect')}}">
+					<button type="button" class="btn btn-default navbar-btn">Sign Out</button>
+				</a>
+			</div>
+
+			{% else %}
 			<div class="col-xs-3 text-right">
 				<a href="{{url_for('login')}}">
 					<button type="button" class="btn btn-default navbar-btn">Sign in</button>
 				</a>
 			</div>
+			{% endif %}
 		</div>
 	</nav>
 </header>
