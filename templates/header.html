@@ -8,7 +8,7 @@
 				</a>
 			</div>
 
-			{% if session['logged_in'] == True %}
+			{% if 'username' in session %}
 			<div class="col-xs-3 text-right">
 				<a href="{{url_for('gdisconnect')}}">
 					<button type="button" class="btn btn-default navbar-btn">Sign Out</button>
