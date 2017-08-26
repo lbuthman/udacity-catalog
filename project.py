@@ -238,11 +238,18 @@ def delete_exercise(category, exercise):
         return render_template("delete-exercise.html", category=category,
             exercise=deletedExercise)
 
+
 def get_category(category_id):
     category = db_session.query(Category).filter_by(id=category_id).one()
     return category.name
 
-def createUser(session):
+
+def get_user_info(user_id):
+    user = db_session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def create_user(session):
     newUser = User(name=session['username'], email=session['email'])
     db_session.add(newUser)
     db_session.commit()
