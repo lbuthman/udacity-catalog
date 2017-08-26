@@ -33,20 +33,6 @@
         <div>
             <h4>{{exercise.description}}</h4>
             <br/>
-            <a href="{{url_for('edit_exercise', category=category.name,
-                exercise=exercise.name)}}">
-                <button class="btn btn-default">
-                    <span class="glyphicon glyphicon-edit" aria-hidden="true">
-                    </span> Edit
-                </button>
-            </a>
-            <a href="{{url_for('delete_exercise', category=category.name,
-                exercise=exercise.name)}}">
-                <button class="btn btn-default">
-                    <span class="glyphicon glyphicon-remove" aria-hidden="true">
-                    </span> Delete
-                </button>
-            </a>
         </div>
         <hr/>
         <br/>
