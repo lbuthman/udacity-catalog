@@ -108,9 +108,12 @@ def gconnect():
     data = answer.json()
 
     session['username'] = data['name']
-    session['logged_in'] = True
     session['email'] = data['email']
     # session['picture'] = data['picture']
+    user_id = get_user_id(session['email'])
+    if not user_id:
+        user_id = create_user(session)
+    session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
