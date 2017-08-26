@@ -221,6 +221,11 @@ def edit_exercise(category, exercise):
     category = db_session.query(Category).filter_by(name=category).first()
     categories = db_session.query(Category).all()
     editedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
+
+    if session['user_id'] != editedExercise.user_id:
+        flash("Sorry, you don't have permission to edit that exercise.", "danger")
+        return redirect(url_for("index"))
+
     if request.method == 'POST':
         editedExercise.name = request.form['name']
         editedExercise.description = request.form['description']
@@ -238,6 +243,11 @@ def delete_exercise(category, exercise):
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
     deletedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
+
+    if session['user_id'] != deletedExercise.user_id:
+        flash("Sorry, you don't have permission to delete that exercise.", "danger")
+        return redirect(url_for("index"))
+
     if request.method == 'POST':
         db_session.delete(deletedExercise)
         db_session.commit()
