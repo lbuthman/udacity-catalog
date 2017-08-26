@@ -196,7 +196,7 @@ def new_exercise(category):
                 name=name, description=description, url=url)
         else:
             newExercise = Exercise(name=name, description=description, url=url,
-                category=category)
+                category=category, user_id=session['user_id'])
             db_session.add(newExercise)
             db_session.commit()
             flash("Sweet to the beat! You successful added an exercise!")
