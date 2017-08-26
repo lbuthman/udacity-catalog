@@ -109,8 +109,8 @@ def gconnect():
 
     session['username'] = data['name']
     session['logged_in'] = True
+    session['email'] = data['email']
     # session['picture'] = data['picture']
-    # session['email'] = data['email']
 
     output = ''
     output += '<h1>Welcome, '
@@ -139,7 +139,7 @@ def gdisconnect():
         del session['gplus_id']
         del session['username']
         del session['logged_in']
-        # del session['email']
+        del session['email']
         # del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
