@@ -152,7 +152,29 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         flash("Failed to revoke token for given user", "danger")
         return redirect(url_for("index"))
-#
+
+@app.route('/categories/JSON/')
+def all_categoriesJSON():
+    categories = db_session.query(Category).all()
+    return jsonify(Categories=[c.serialize for c in categories])
+
+@app.route('/exercises/JSON/')
+def all_exercisesJSON():
+    exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).all()
+    return jsonify(Exercises=[e.serialize for e in exercises])
+
+@app.route('/<category>/exercises/JSON/')
+def category_exercisesJSON(category):
+    category = db_session.query(Category).filter_by(name=category).one()
+    exercises = db_session.query(Exercise).filter_by(category=category).all()
+    return jsonify(CategoryExercises=[e.serialize for e in exercises])
+
+@app.route('/<category>/<exercise>/JSON/')
+def one_exerciseJSON(category, exercise):
+    category = db_session.query(Category).filter_by(name=category).one()
+    exercise = db_session.query(Exercise).filter_by(name=exercise, category=category).one()
+    return jsonify(Exercise=[exercise.serialize])
+
 @app.route('/')
 @app.route('/index.html/')
 def index():
