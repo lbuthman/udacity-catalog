@@ -73,7 +73,7 @@ Now it's time to have some fun!
 
 You don't have to be logged in to see everything, but you do need to be logged
 in to add, edit or delete exercises. Do keep in mind that you can only edit and
-delete exercises that you have created. To signin, you will need a <a href="https://www.facebook.com/r.php">Facebook</a> or <a href="https://accounts.google.com/SignUp?hl=en>Google account</a>. If you don't
+delete exercises that you have created. To signin, you will need a <a href="https://www.facebook.com/r.php">Facebook</a> or <a href="https://accounts.google.com/SignUp?hl=en">Google account</a>. If you don't
 have one already, don't worry, they are easy to sign up for. Just click on their
 links and follow the steps.
 
