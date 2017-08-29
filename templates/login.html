@@ -9,7 +9,16 @@
     {% block content %}
     {% include "header.html" %}
 
-    <div id="signInButton">
+    <div class="text-center">
+        <h2>Sign In with your Google or Facebook Account</h2>
+        <h4>choose wisely ...</h4>
+        <hr>
+    </div>
+
+    <div id="result"></div>
+
+    <!-- Google Signin -->
+    <div class="text-center" id="signInButton">
         <span class="g-signin"
         data-scope="openid email"
         data-clientid="990017836061-ja9a7eo6jm9vc3or0qnfq27a9sjdjon9.apps.googleusercontent.com"
@@ -20,38 +29,110 @@
         data-approvalprompt="force">
         </span>
     </div>
-    <div id="result"></div>
+    <script>
+        function signInCallback(authResult) {
+            if (authResult['code']) {
+                // Hide the sign-in button now that the user is authorized
+                $('#signInButton').attr('style', 'display: none');
+                $('#fb-signin-button').attr('style', 'display: none');
+                // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+                $.ajax({
+                    type: 'POST',
+                    url: '/gconnect?state={{STATE}}',
+                    processData: false,
+                    data: authResult['code'],
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    success: function(result) {
+                        // Handle or verify the server response if necessary.
+                        if (result) {
+                            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                            setTimeout(function() {
+                                window.location.href = "/index.html";
+                            }, 4000);
+
+                        } else if (authResult['error']) {
+                            console.log('There was an error: ' + authResult['error']);
+                        } else {
+                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                        }
+                    }
+
+                });
+            }
+        }
+    </script>
+
+    <!-- Facebook Signin -->
+    <div class="text-center">
+        <div class="fb-login-button" id="fb-signin-button"
+            data-max-rows="2"
+            data-size="medium"
+            data-button-type="login_with"
+            data-show-faces="false"
+            data-use-continue-as="false"
+            scope="public_profile,email"
+            onlogin="sendTokenToServer();">
+        </div>
+    </div>
+    <!-- <button>
+        <fb:login-button  onlogin="sendTokenToServer();">
+            <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+        </fb:login-button>
+    </button> -->
+
+    <div id="fb-root"></div>
 
     <script>
-    function signInCallback(authResult) {
-        if (authResult['code']) {
-            // Hide the sign-in button now that the user is authorized
-            $('#signinButton').attr('style', 'display: none');
-            // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
-            $.ajax({
-                type: 'POST',
-                url: '/gconnect?state={{STATE}}',
-                processData: false,
-                data: authResult['code'],
-                contentType: 'application/octet-stream; charset=utf-8',
-                success: function(result) {
-                    // Handle or verify the server response if necessary.
-                    if (result) {
-                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
-                        setTimeout(function() {
-                            window.location.href = "/index.html";
-                        }, 4000);
+        //*Facebook Sign in*/
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '1443665635715739',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v2.8'
+            });
+            FB.AppEvents.logPageView();
+        };
 
-                    } else if (authResult['error']) {
-                        console.log('There was an error: ' + authResult['error']);
-                    } else {
-                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+        (function(d, s, id){
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=1443665635715739";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function sendTokenToServer() {
+            var access_token = FB.getAuthResponse()['accessToken'];
+            FB.api('/me', function(response) {
+                console.log('Successful login for: ' + response.name);
+                $.ajax({
+                    type: 'POST',
+                    url: '/fbconnect?state={{STATE}}',
+                    processData: false,
+                    data: access_token,
+                    contentType: 'application/octet-stream; charset=utf-8',
+                    success: function(result) {
+                        // Handle or verify the server response if necessary.
+                        if (result) {
+                            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                            setTimeout(function() {
+                                window.location.href = "/index.html";
+                            }, 4000);
+
+                        } else {
+                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                        }
                     }
-                }
 
-            }); } }
-            </script>
+                });
+            });
+        }
+
+    </script>
+
     {% include "footer.html" %}
     {% endblock %}
+
 </body>
 </html>
