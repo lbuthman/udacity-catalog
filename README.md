@@ -77,6 +77,21 @@ delete exercises that you have created. To signin, you will need a <a href="http
 have one already, don't worry, they are easy to sign up for. Just click on their
 links and follow the steps.
 
+## Adding Exercises to the Catalog
+
+While it is pretty easy to add exercises to a category in the catalog, there is
+one gotcha I would like to point out. Here are the steps to follow when adding
+a new item.
+
+1. Navigate to the category you want to add an exercise to.
+2. Scroll to the bottom of the page and click on the Add Icon.
+3. Enter the data requested in the form.
+4. For the YouTube URL, be sure to add the embedded link. You can find this
+link when on the YouTube video. Find the 'Share' on the page, just under the
+video title. After clicking on Share, find and click on Embed. You will then
+look for src="https://www.youtube.com/embed/...". Copy everything inside those
+quotes and use that for the YouTube URL.
+
 ## JSON Requests
 
 Sometimes in life, you just got to get your JSON On. AmIRight?! Luckily, we
