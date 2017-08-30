@@ -1,5 +1,5 @@
-from flask import (Flask, render_template, request, redirect, url_for, flash,
-jsonify)
+from flask import (
+    Flask, render_template, request, redirect, url_for, flash, jsonify)
 from flask import session
 from flask import make_response
 from sqlalchemy import create_engine, asc, desc
@@ -7,12 +7,14 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Exercise, User
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
-import random, string
+import random
+import string
 import json
 import httplib2
 import requests
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(
+            open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Exercise Catalog"
 
 app = Flask(__name__)
@@ -22,6 +24,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
+
 # Create anti-forgery state token
 @app.route('/login/')
 def login():
@@ -29,6 +32,7 @@ def login():
                     for x in range(32))
     session['state'] = state
     return render_template("login.html", STATE=state)
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -85,8 +89,8 @@ def gconnect():
     stored_access_token = session.get('access_token')
     stored_gplus_id = session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+                    json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -118,16 +122,19 @@ def gconnect():
         session['username']), "success")
     return output
 
+
 def gdisconnect():
     access_token = session.get('access_token')
     if access_token is None:
         print('Access Token is None')
-        response = make_response(json.dumps('Current user is not connected'), 401)
+        response = make_response(
+                    json.dumps('Current user is not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         flash("Current user is not connected", "warning")
         return response
 
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % (
+            session['access_token'])
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
@@ -136,7 +143,8 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(
+                    json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         flash("Failed to revoke token for given user", "danger")
         return response
@@ -154,8 +162,11 @@ def fbconnect():
     access_token = request.data
     access_token = access_token.decode("utf-8")
 
-    app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
-    app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    app_id = json.loads(
+                open('fb_client_secrets.json', 'r').read())['web']['app_id']
+    app_secret = json.loads(
+                open(
+                    'fb_client_secrets.json', 'r').read())['web']['app_secret']
     url = ('https://graph.facebook.com/v2.10/oauth/access_token?'
            'grant_type=fb_exchange_token&client_id=%s&client_secret=%s'
            '&fb_exchange_token=%s') % (app_id, app_secret, access_token)
@@ -228,10 +239,12 @@ def all_categoriesJSON():
     categories = db_session.query(Category).all()
     return jsonify(Categories=[c.serialize for c in categories])
 
+
 @app.route('/exercises/JSON/')
 def all_exercisesJSON():
     exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).all()
     return jsonify(Exercises=[e.serialize for e in exercises])
+
 
 @app.route('/<category>/exercises/JSON/')
 def category_exercisesJSON(category):
@@ -239,40 +252,50 @@ def category_exercisesJSON(category):
     exercises = db_session.query(Exercise).filter_by(category=category).all()
     return jsonify(CategoryExercises=[e.serialize for e in exercises])
 
+
 @app.route('/<category>/<exercise>/JSON/')
 def one_exerciseJSON(category, exercise):
     category = db_session.query(Category).filter_by(name=category).one()
-    exercise = db_session.query(Exercise).filter_by(name=exercise, category=category).one()
+    exercise = db_session.query(
+                Exercise).filter_by(name=exercise, category=category).one()
     return jsonify(Exercise=[exercise.serialize])
+
 
 @app.route('/')
 @app.route('/index.html/')
 def index():
     categories = db_session.query(Category)
-    exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).limit(10).all()
-    return render_template("index.html", categories=categories,
-        exercises=exercises)
+    exercises = db_session.query(
+                Exercise).order_by(desc(Exercise.id)).limit(10).all()
+    return render_template(
+            "index.html", categories=categories, exercises=exercises)
+
 
 @app.route('/<category>/')
 def view_category(category):
     category = db_session.query(Category).filter_by(name=category).first()
     exercises = db_session.query(Exercise).filter_by(category=category).all()
-    return render_template("view-category.html", category=category, exercises=exercises)
+    return render_template(
+            "view-category.html", category=category, exercises=exercises)
+
 
 @app.route('/<category>/<exercise>/')
 def view_exercise(category, exercise):
     category = db_session.query(Category).filter_by(name=category).first()
     exercise = db_session.query(Exercise).filter_by(name=exercise).first()
     if session['user_id'] == exercise.user_id:
-        return render_template("view-exercise.html", category=category,
-            exercise=exercise)
+        return render_template(
+                "view-exercise.html", category=category, exercise=exercise)
     else:
-        return render_template("publicview-exercise.html", category=category,
-            exercise=exercise)
+        return render_template(
+                "publicview-exercise.html", category=category,
+                exercise=exercise)
+
 
 @app.route('/how-it-works/')
 def how_it_works():
     return render_template("how-it-works.html")
+
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
@@ -287,24 +310,31 @@ def new_exercise(category):
         description = request.form['description']
         url = request.form['url']
         if name == "" or description == "" or url == "":
-            flash("All fields are required. Please check and try again", 'danger')
-            return render_template("new-exercise.html", category=category,
-                name=name, description=description, url=url)
+            flash(
+                "All fields are required. Please check and try again",
+                'danger')
+            return render_template(
+                    "new-exercise.html", category=category,
+                    name=name, description=description, url=url)
         elif "embed" not in url:
             flash("""Uh oh! Double check the url and make sure you use the
-                embedded version.""", 'warning')
-            return render_template("new-exercise.html", category=category,
-                name=name, description=description, url=url)
+                    embedded version.""", 'warning')
+            return render_template(
+                    "new-exercise.html", category=category,
+                    name=name, description=description, url=url)
         else:
-            newExercise = Exercise(name=name, description=description, url=url,
-                category=category, user_id=session['user_id'])
+            newExercise = Exercise(
+                            name=name, description=description, url=url,
+                            category=category, user_id=session['user_id'])
             db_session.add(newExercise)
             db_session.commit()
             flash("Sweet to the beat! You successful added an exercise!")
             return redirect(url_for("view_category", category=category.name))
     else:
-        return render_template("new-exercise.html", category=category, name=name,
+        return render_template(
+            "new-exercise.html", category=category, name=name,
             description=description, url=url)
+
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
@@ -312,10 +342,13 @@ def edit_exercise(category, exercise):
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
     categories = db_session.query(Category).all()
-    editedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
+    editedExercise = db_session.query(
+                        Exercise).filter_by(name=exercise).first()
 
     if session['user_id'] != editedExercise.user_id:
-        flash("Sorry, you don't have permission to edit that exercise.", "danger")
+        flash(
+            "Sorry, you don't have permission to edit that exercise.",
+            "danger")
         return redirect(url_for("index"))
 
     if request.method == 'POST':
@@ -323,21 +356,27 @@ def edit_exercise(category, exercise):
         editedExercise.description = request.form['description']
         editedExercise.url = request.form['url']
         flash("Exercise {} has been edited.".format(editedExercise.name))
-        return redirect(url_for("view_exercise", category=category.name,
-            exercise=editedExercise.name))
+        return redirect(url_for(
+                "view_exercise", category=category.name,
+                exercise=editedExercise.name))
     else:
-        return render_template("edit-exercise.html", category=category,
-            categories=categories, exercise=editedExercise)
+        return render_template(
+                "edit-exercise.html", category=category,
+                categories=categories, exercise=editedExercise)
+
 
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
     if 'username' not in session:
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
-    deletedExercise = db_session.query(Exercise).filter_by(name=exercise).first()
+    deletedExercise = db_session.query(
+                        Exercise).filter_by(name=exercise).first()
 
     if session['user_id'] != deletedExercise.user_id:
-        flash("Sorry, you don't have permission to delete that exercise.", "danger")
+        flash(
+            "Sorry, you don't have permission to delete that exercise.",
+            "danger")
         return redirect(url_for("index"))
 
     if request.method == 'POST':
@@ -346,14 +385,16 @@ def delete_exercise(category, exercise):
         flash("Exercise {} has been deleted.".format(deletedExercise.name))
         return redirect(url_for("view_category", category=category.name))
     else:
-        return render_template("delete-exercise.html", category=category,
-            exercise=deletedExercise)
+        return render_template(
+                "delete-exercise.html", category=category,
+                exercise=deletedExercise)
 
 
 def get_category(category_id):
     """Returns the name of a category for a given category ID."""
     category = db_session.query(Category).filter_by(id=category_id).one()
     return category.name
+
 
 # Add the get_category() method to jinja template's global environment
 app.jinja_env.globals.update(get_category=get_category)
@@ -389,4 +430,4 @@ def create_user(session):
 if __name__ == "__main__":
     app.secret_key = "supersupersecretkey"
     app.debug = True
-    app.run(host = '0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8000)
