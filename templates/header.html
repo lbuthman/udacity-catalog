@@ -9,19 +9,25 @@
 			</div>
 
 			{% if 'username' in session %}
-			<div class="col-xs-3 text-right">
+			<div class="pull-right nav-buttons">
 				<a href="{{url_for('disconnect')}}">
 					<button type="button" class="btn btn-default navbar-btn">Sign Out</button>
 				</a>
 			</div>
 
 			{% else %}
-			<div class="col-xs-3 text-right">
+			<div class="pull-right nav-buttons">
 				<a href="{{url_for('login')}}">
 					<button type="button" class="btn btn-default navbar-btn">Sign in</button>
 				</a>
 			</div>
 			{% endif %}
+
+			<div class="pull-right nav-buttons">
+				<a href="{{url_for('how_it_works')}}">
+					<button type="button" class="btn btn-default navbar-btn">How It Works</button>
+				</a>
+			</div>
 		</div>
 	</nav>
 </header>
