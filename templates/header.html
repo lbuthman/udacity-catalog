@@ -10,14 +10,7 @@
 
 			{% if 'username' in session %}
 			<div class="col-xs-3 text-right">
-				<a href="{{url_for('gdisconnect')}}">
-					<button type="button" class="btn btn-default navbar-btn">Sign Out</button>
-				</a>
-			</div>
-
-			{% elif 'facebook_id' in session %}
-			<div class="col-xs-3 text-right">
-				<a href="{{url_for('fbdisconnect')}}">
+				<a href="{{url_for('disconnect')}}">
 					<button type="button" class="btn btn-default navbar-btn">Sign Out</button>
 				</a>
 			</div>
