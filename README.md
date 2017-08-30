@@ -6,7 +6,7 @@ add, remove, or delete their own videos. In addition, user's can view all the
 other existing videos on the site. Finally, JSON requests are provided for certain
 views (more details are provided below).
 
-Thanks to the good folks at Udacity for awesome instruction and support in
+Thanks to the good folks at Udacity for superlative instruction and support in
 creating this project.
 
 ## Required Setup
@@ -53,7 +53,7 @@ Ready to get the website up and running? Let's set it up and get going!
 
 4. <a href="https://github.com/lbuthman/udacity-catalog">Exercise Catalog Repo</a>
     - Here is the project repository hosted on GitHub. Feel free to Fork, Clone,
-    Download, or ... Copy/Paste if you are a sadist.
+    Download, or Copy/Paste if you are a sadist.
     - Make sure to place the directory in your vagrant directory.
 
 5. Populate the Database
@@ -73,7 +73,7 @@ Now it's time to have some fun!
 
 You don't have to be logged in to see everything, but you do need to be logged
 in to add, edit or delete exercises. Do keep in mind that you can only edit and
-delete exercises that you have created. To signin, you will need a <a href="https://www.facebook.com/r.php">Facebook</a> or <a href="https://accounts.google.com/SignUp?hl=en">Google account</a>. If you don't
+delete exercises that you have created. To sign-in, you will need a <a href="https://www.facebook.com/r.php">Facebook</a> or <a href="https://accounts.google.com/SignUp?hl=en">Google account</a>. If you don't
 have one already, don't worry, they are easy to sign up for. Just click on their
 links and follow the steps.
 
@@ -105,6 +105,6 @@ have provided several JSON endpoints for you to use at your pleasure.
     -> this will return data for all the exercises of a specified category
     -> replace <category-name> with the category of your choice
 4. /<category-name>/<exercise-name>/JSON/
-    -> this will return one the data for a specific exercise
+    -> this will return the data for a specific exercise
     -> replace <category-name> with the category of your choice and
     <exercise-name> with the exercise of your choice
