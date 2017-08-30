@@ -66,12 +66,6 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # If there was an error in the access token info, abort.
-    if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
     # Verify that the access token is used for the intended user.
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
@@ -107,6 +101,7 @@ def gconnect():
 
     data = answer.json()
 
+    session['provider'] = 'google'
     session['username'] = data['name']
     session['email'] = data['email']
     # session['picture'] = data['picture']
@@ -123,7 +118,6 @@ def gconnect():
         session['username']), "success")
     return output
 
-@app.route('/gdisconnect')
 def gdisconnect():
     access_token = session.get('access_token')
     if access_token is None:
@@ -131,59 +125,58 @@ def gdisconnect():
         response = make_response(json.dumps('Current user is not connected'), 401)
         response.headers['Content-Type'] = 'application/json'
         flash("Current user is not connected", "warning")
-        return redirect(url_for("index"))
+        return response
 
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
     if result['status'] == '200':
-        del session['access_token']
-        del session['gplus_id']
-        del session['username']
-        del session['email']
-        # del session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        flash("You have been Successfully disconnected", "success")
-        return redirect(url_for("index"))
+        return response
     else:
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         flash("Failed to revoke token for given user", "danger")
-        return redirect(url_for("index"))
+        return response
+
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     # Validate state token
-    if request.args.get('state') != login_session['state']:
+    if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Obtain authorization code
     access_token = request.data
+    access_token = access_token.decode("utf-8")
 
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_id']
     app_secret = json.loads(open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = """https://graph.facebook.com/oauth/access_token?grant_typ=fb_exchange_token
-        &client_id=%s&client_secret=%s&fb_exchange_token=%s""" % (app_id,
-        app_secret, access_token)
+    url = ('https://graph.facebook.com/v2.10/oauth/access_token?'
+           'grant_type=fb_exchange_token&client_id=%s&client_secret=%s'
+           '&fb_exchange_token=%s') % (app_id, app_secret, access_token)
+
     h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    str_response = h.request(url, 'GET')[1].decode('utf-8')
+    data = json.loads(str_response)
 
-    userinfo_url = "https://graph.facebook.com/v2.2/me"
-    token = h.result.split("&")[0]
+    # Extract the access token from response
+    token = 'access_token=' + data['access_token']
 
-    url = "https://graph.facebook.com/v2.8/me?%s&fields=name,id,email" % token
+    url = "https://graph.facebook.com/v2.10/me?%s&fields=name,id,email" % token
     h = httplib2.Http()
-    result = request(url, 'GET')[1]
+    str_response = h.request(url, 'GET')[1].decode('utf-8')
+    data = json.loads(str_response)
 
-    data = json.loads(result)
-
-    login_session['username'] = data['name']
-    login_session['email'] = data['email']
-    login_session['facebook_id'] = data['id']
+    session['provider'] = 'facebook'
+    session['username'] = data['name']
+    session['email'] = data['email']
+    session['facebook_id'] = data['id']
+    session['access_token'] = token
 
     user_id = get_user_id(session['email'])
     if not user_id:
@@ -198,18 +191,37 @@ def fbconnect():
         session['username']), "success")
     return output
 
-@app.route('/fbdisconnect')
+
 def fbdisconnect():
-    facebook_id = login_session['facebook_id']
-    url = "https://graph.facebook.com/%s/permissions" % facebook_id
+    facebook_id = session['facebook_id']
+    access_token = session['access_token']
+    url = "https://graph.facebook.com/%s/permissions?access_token=%s" % (
+        facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
-    del login_session['username']
-    del login_session['email']
-    del login_session['user_id']
-    del login_session['facebook_id']
-    flash("You have been Successfully disconnected", "success")
-    return redirect(url_for("index"))
+    return "success"
+
+
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in session:
+        if session['provider'] == 'google':
+            gdisconnect()
+            del session['access_token']
+            del session['gplus_id']
+        if session['provider'] == 'facebook':
+            fbdisconnect()
+            del session['facebook_id']
+        del session['username']
+        del session['email']
+        del session['user_id']
+        del session['provider']
+        flash("You have been Successfully disconnected", "success")
+        return redirect(url_for("index"))
+    else:
+        flash("You were never logged in (never even here, creepy.)", "warning")
+        return redirect(url_for("index"))
+
 
 @app.route('/categories/JSON/')
 def all_categoriesJSON():
@@ -339,11 +351,16 @@ def delete_exercise(category, exercise):
 
 
 def get_category(category_id):
+    """Returns the name of a category for a given category ID."""
     category = db_session.query(Category).filter_by(id=category_id).one()
     return category.name
 
+# Add the get_category() method to jinja template's global environment
+app.jinja_env.globals.update(get_category=get_category)
+
 
 def get_user_id(email):
+    """Returns the user id for a given user's email address if exists."""
     try:
         user = db_session.query(User).filter_by(email=email).one()
         return user.id
@@ -352,18 +369,22 @@ def get_user_id(email):
 
 
 def get_user_info(user_id):
-    user = db_session.query(User).filter_by(id=user_id).one()
-    return user
+    """Returns the user for a given user's id if exists."""
+    try:
+        user = db_session.query(User).filter_by(id=user_id).one()
+        return user
+    except:
+        return None
 
 
 def create_user(session):
+    """Adds new user to Database and returns the user's id."""
     newUser = User(name=session['username'], email=session['email'])
     db_session.add(newUser)
     db_session.commit()
     user = db_session.query(User).filter_by(email=session['email']).one()
     return user.id
 
-app.jinja_env.globals.update(get_category=get_category)
 
 if __name__ == "__main__":
     app.secret_key = "supersupersecretkey"
