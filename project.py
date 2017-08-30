@@ -283,13 +283,15 @@ def view_category(category):
 def view_exercise(category, exercise):
     category = db_session.query(Category).filter_by(name=category).first()
     exercise = db_session.query(Exercise).filter_by(name=exercise).first()
-    if session['user_id'] == exercise.user_id:
+    try:
+        if session['user_id'] == exercise.user_id:
+            return render_template(
+                    "view-exercise.html", category=category, exercise=exercise)
+    except KeyError:
+        print("No user id available")
         return render_template(
-                "view-exercise.html", category=category, exercise=exercise)
-    else:
-        return render_template(
-                "publicview-exercise.html", category=category,
-                exercise=exercise)
+            "publicview-exercise.html", category=category,
+            exercise=exercise)
 
 
 @app.route('/how-it-works/')
@@ -369,6 +371,7 @@ def edit_exercise(category, exercise):
 def delete_exercise(category, exercise):
     if 'username' not in session:
         return redirect('/login')
+
     category = db_session.query(Category).filter_by(name=category).first()
     deletedExercise = db_session.query(
                         Exercise).filter_by(name=exercise).first()
