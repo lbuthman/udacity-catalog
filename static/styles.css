@@ -1,9 +1,13 @@
 body {
     background-color: #241E5A;
     color: white;
-    
+
 }
 
 .vertical-line {
     border-left: thin solid white;
+}
+
+.nav-buttons {
+    margin-right: 5px;
 }
