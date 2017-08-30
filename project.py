@@ -25,9 +25,9 @@ DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
 
-# Create anti-forgery state token
 @app.route('/login/')
 def login():
+    """Creates anti-forgery state token and returns login view"""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     session['state'] = state
@@ -36,6 +36,7 @@ def login():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """Tries to get access token from Google for Sigin, returns outcome."""
     # Validate state token
     if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -124,6 +125,7 @@ def gconnect():
 
 
 def gdisconnect():
+    """Tries to remove access token from Google and returns response"""
     access_token = session.get('access_token')
     if access_token is None:
         print('Access Token is None')
@@ -152,6 +154,7 @@ def gdisconnect():
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
+    """Tries to get access token from Facebook for Sigin, returns outcome."""
     # Validate state token
     if request.args.get('state') != session['state']:
         response = make_response(json.dumps('Invalid state parameter'), 401)
@@ -204,6 +207,7 @@ def fbconnect():
 
 
 def fbdisconnect():
+    """Tries to remove access token from Facebook and returns response"""
     facebook_id = session['facebook_id']
     access_token = session['access_token']
     url = "https://graph.facebook.com/%s/permissions?access_token=%s" % (
@@ -215,6 +219,7 @@ def fbdisconnect():
 
 @app.route('/disconnect')
 def disconnect():
+    """Handles request for Logout and removes associated data if successful"""
     if 'provider' in session:
         if session['provider'] == 'google':
             gdisconnect()
@@ -236,18 +241,21 @@ def disconnect():
 
 @app.route('/categories/JSON/')
 def all_categoriesJSON():
+    """Returns JSON data for all Categories in Catalog"""
     categories = db_session.query(Category).all()
     return jsonify(Categories=[c.serialize for c in categories])
 
 
 @app.route('/exercises/JSON/')
 def all_exercisesJSON():
+    """Returns JSON data for all Exercises in Catalog"""
     exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).all()
     return jsonify(Exercises=[e.serialize for e in exercises])
 
 
 @app.route('/<category>/exercises/JSON/')
 def category_exercisesJSON(category):
+    """Returns JSON data for all Exercises in a specified Category"""
     category = db_session.query(Category).filter_by(name=category).one()
     exercises = db_session.query(Exercise).filter_by(category=category).all()
     return jsonify(CategoryExercises=[e.serialize for e in exercises])
@@ -255,6 +263,7 @@ def category_exercisesJSON(category):
 
 @app.route('/<category>/<exercise>/JSON/')
 def one_exerciseJSON(category, exercise):
+    """Returns JSON data for one Exercise in a specified Category"""
     category = db_session.query(Category).filter_by(name=category).one()
     exercise = db_session.query(
                 Exercise).filter_by(name=exercise, category=category).one()
@@ -264,6 +273,7 @@ def one_exerciseJSON(category, exercise):
 @app.route('/')
 @app.route('/index.html/')
 def index():
+    """Returns home view of website"""
     categories = db_session.query(Category)
     exercises = db_session.query(
                 Exercise).order_by(desc(Exercise.id)).limit(10).all()
@@ -273,6 +283,7 @@ def index():
 
 @app.route('/<category>/')
 def view_category(category):
+    """Returns view of all exercises for a specified Category"""
     category = db_session.query(Category).filter_by(name=category).first()
     exercises = db_session.query(Exercise).filter_by(category=category).all()
     return render_template(
@@ -281,6 +292,7 @@ def view_category(category):
 
 @app.route('/<category>/<exercise>/')
 def view_exercise(category, exercise):
+    """Returns view of one exercise for a specified Category"""
     category = db_session.query(Category).filter_by(name=category).first()
     exercise = db_session.query(Exercise).filter_by(name=exercise).first()
     try:
@@ -296,11 +308,13 @@ def view_exercise(category, exercise):
 
 @app.route('/how-it-works/')
 def how_it_works():
+    """Returns helpful info on how to use the website"""
     return render_template("how-it-works.html")
 
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
+    """Returns view to add a new exercise to Catalog"""
     if 'username' not in session:
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
@@ -340,6 +354,7 @@ def new_exercise(category):
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
 def edit_exercise(category, exercise):
+    """Returns view to edit an exisiting exercise in the Catalog"""
     if 'username' not in session:
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
@@ -369,6 +384,7 @@ def edit_exercise(category, exercise):
 
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
 def delete_exercise(category, exercise):
+    """Returns view to delete an existing exercise in the Catalog"""
     if 'username' not in session:
         return redirect('/login')
 
