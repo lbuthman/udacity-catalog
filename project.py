@@ -148,7 +148,6 @@ def gdisconnect():
         response = make_response(
                     json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-        flash("Failed to revoke token for given user", "danger")
         return response
 
 
@@ -222,7 +221,10 @@ def disconnect():
     """Handles request for Logout and removes associated data if successful"""
     if 'provider' in session:
         if session['provider'] == 'google':
-            gdisconnect()
+            response = gdisconnect()
+            if response.status_code == 400:
+                flash("Error, please delete your cookies for this site.")
+                redirect(url_for("index"))
             del session['access_token']
             del session['gplus_id']
         if session['provider'] == 'facebook':
@@ -315,17 +317,32 @@ def how_it_works():
 @app.route('/<category>/new/', methods=['GET', 'POST'])
 def new_exercise(category):
     """Returns view to add a new exercise to Catalog"""
+
     if 'username' not in session:
         return redirect('/login')
+
+    user = ""
+    try:
+        user = db_session.query(User).filter_by(name=session['username']).one()
+    except:
+        return redirect('/login')
+
     category = db_session.query(Category).filter_by(name=category).first()
-    user = db_session.query(User).filter_by(name=session['username']).one()
     name = ""
     description = ""
     url = ""
+
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
         url = request.form['url']
+        if db_session.query(Exercise).filter_by(name=name).count() != 0:
+            flash(
+                "Oops! That name is already taken. Please select a new name.",
+                'danger')
+            return render_template(
+                    "new-exercise.html", category=category,
+                    name=name, description=description, url=url)
         if name == "" or description == "" or url == "":
             flash(
                 "All fields are required. Please check and try again",
