@@ -318,6 +318,7 @@ def new_exercise(category):
     if 'username' not in session:
         return redirect('/login')
     category = db_session.query(Category).filter_by(name=category).first()
+    user = db_session.query(User).filter_by(name=session['username']).one()
     name = ""
     description = ""
     url = ""
@@ -341,7 +342,7 @@ def new_exercise(category):
         else:
             newExercise = Exercise(
                             name=name, description=description, url=url,
-                            category=category, user_id=session['user_id'])
+                            category=category, user=user)
             db_session.add(newExercise)
             db_session.commit()
             flash("Sweet to the beat! You successful added an exercise!")
