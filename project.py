@@ -243,6 +243,7 @@ def disconnect():
 
 
 @app.route('/categories/JSON/')
+@app.route('/categories/json/')
 def all_categoriesJSON():
     """Returns JSON data for all Categories in Catalog"""
     categories = db_session.query(Category).all()
@@ -250,6 +251,7 @@ def all_categoriesJSON():
 
 
 @app.route('/exercises/JSON/')
+@app.route('/exercises/json/')
 def all_exercisesJSON():
     """Returns JSON data for all Exercises in Catalog"""
     exercises = db_session.query(Exercise).order_by(desc(Exercise.id)).all()
@@ -257,6 +259,7 @@ def all_exercisesJSON():
 
 
 @app.route('/<category>/exercises/JSON/')
+@app.route('/<category>/exercises/json/')
 def category_exercisesJSON(category):
     """Returns JSON data for all Exercises in a specified Category"""
     category = db_session.query(Category).filter_by(name=category).one()
@@ -265,6 +268,7 @@ def category_exercisesJSON(category):
 
 
 @app.route('/<category>/<exercise>/JSON/')
+@app.route('/<category>/<exercise>/json/')
 def one_exerciseJSON(category, exercise):
     """Returns JSON data for one Exercise in a specified Category"""
     category = db_session.query(Category).filter_by(name=category).one()
