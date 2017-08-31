@@ -17,6 +17,14 @@ body {
     margin-right: 5px;
 }
 
+.form-header {
+  margin-left: 4vw;
+}
+
+.form {
+  margin-left: 3vw;
+}
+
 .footer {
     position: absolute;
     bottom: 0;
