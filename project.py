@@ -302,17 +302,14 @@ def view_exercise(category, exercise):
         if session['user_id'] == exercise.user_id:
             return render_template(
                     "view-exercise.html", category=category, exercise=exercise)
-    except KeyError:
+    except (KeyError, ValueError):
         print("No user id available")
         return render_template(
             "publicview-exercise.html", category=category,
             exercise=exercise)
-
-
-@app.route('/how-it-works/')
-def how_it_works():
-    """Returns helpful info on how to use the website"""
-    return render_template("how-it-works.html")
+    return render_template(
+        "publicview-exercise.html", category=category,
+        exercise=exercise)
 
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
@@ -396,7 +393,7 @@ def edit_exercise(category, exercise):
             return render_template(
                     "edit-exercise.html", category=category,
                     categories=categories, exercise=editedExercise)
-                    
+
         editedExercise.name = request.form['name']
         editedExercise.description = request.form['description']
         editedExercise.url = request.form['url']
