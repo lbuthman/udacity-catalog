@@ -194,6 +194,7 @@ def fbconnect():
     user_id = get_user_id(session['email'])
     if not user_id:
         user_id = create_user(session)
+
     session['user_id'] = user_id
 
     output = ''
@@ -323,7 +324,7 @@ def new_exercise(category):
 
     user = ""
     try:
-        user = db_session.query(User).filter_by(name=session['username']).one()
+        user = db_session.query(User).filter_by(email=session['email']).one()
     except:
         return redirect('/login')
 
@@ -387,6 +388,15 @@ def edit_exercise(category, exercise):
         return redirect(url_for("index"))
 
     if request.method == 'POST':
+
+        if db_session.query(Exercise).filter_by(name=request.form['name']).count() != 0:
+            flash(
+                "Oops! That name is already taken. Please select a new name.",
+                'danger')
+            return render_template(
+                    "edit-exercise.html", category=category,
+                    categories=categories, exercise=editedExercise)
+                    
         editedExercise.name = request.form['name']
         editedExercise.description = request.form['description']
         editedExercise.url = request.form['url']

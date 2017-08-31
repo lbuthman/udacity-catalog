@@ -2,6 +2,20 @@
 {% block content %}
 {% include "header.html" %}
 <article class="row">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Categories: success (green), info (blue), warning (yellow), danger (red)-->
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible text-center" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{message}}
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <div>
         <h2>Edit "{{exercise.name}}" in "{{category.name}}"</h2>
         <hr/>
