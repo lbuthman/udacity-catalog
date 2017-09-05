@@ -303,7 +303,7 @@ def index():
             "index.html", categories=categories, exercises=exercises)
 
 
-@app.route('/<category>/')
+@app.route('/<path:category>/')
 def view_category(category):
     """Returns view of all exercises for a specified Category"""
     category = db_session.query(Category).filter_by(name=category).first()
@@ -312,7 +312,7 @@ def view_category(category):
             "view-category.html", category=category, exercises=exercises)
 
 
-@app.route('/<category>/<exercise>/')
+@app.route('/<path:category>/<path:exercise>/')
 def view_exercise(category, exercise):
     """Returns view of one exercise for a specified Category"""
     category = db_session.query(Category).filter_by(name=category).first()
@@ -331,7 +331,7 @@ def view_exercise(category, exercise):
         exercise=exercise)
 
 
-@app.route('/<category>/new/', methods=['GET', 'POST'])
+@app.route('/<path:category>/new/', methods=['GET', 'POST'])
 @login_required
 def new_exercise(category):
     """Returns view to add a new exercise to Catalog"""
@@ -385,7 +385,7 @@ def new_exercise(category):
             description=description, url=url)
 
 
-@app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
+@app.route('/<path:category>/<path:exercise>/edit/', methods=['GET', 'POST'])
 @login_required
 def edit_exercise(category, exercise):
     """Returns view to edit an exisiting exercise in the Catalog"""
@@ -424,7 +424,7 @@ def edit_exercise(category, exercise):
                 categories=categories, exercise=editedExercise)
 
 
-@app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
+@app.route('/<path:category>/<path:exercise>/delete/', methods=['GET', 'POST'])
 @login_required
 def delete_exercise(category, exercise):
     """Returns view to delete an existing exercise in the Catalog"""
