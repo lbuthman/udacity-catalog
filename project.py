@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Exercise, User
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+from functools import wraps
 import random
 import string
 import json
@@ -37,6 +38,15 @@ def login():
                     for x in range(32))
     session['state'] = state
     return render_template("login.html", STATE=state)
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -322,11 +332,9 @@ def view_exercise(category, exercise):
 
 
 @app.route('/<category>/new/', methods=['GET', 'POST'])
+@login_required
 def new_exercise(category):
     """Returns view to add a new exercise to Catalog"""
-
-    if 'username' not in session:
-        return redirect('/login')
 
     user = ""
     try:
@@ -378,10 +386,10 @@ def new_exercise(category):
 
 
 @app.route('/<category>/<exercise>/edit/', methods=['GET', 'POST'])
+@login_required
 def edit_exercise(category, exercise):
     """Returns view to edit an exisiting exercise in the Catalog"""
-    if 'username' not in session:
-        return redirect('/login')
+
     category = db_session.query(Category).filter_by(name=category).first()
     categories = db_session.query(Category).all()
     editedExercise = db_session.query(
@@ -417,10 +425,9 @@ def edit_exercise(category, exercise):
 
 
 @app.route('/<category>/<exercise>/delete/', methods=['GET', 'POST'])
+@login_required
 def delete_exercise(category, exercise):
     """Returns view to delete an existing exercise in the Catalog"""
-    if 'username' not in session:
-        return redirect('/login')
 
     category = db_session.query(Category).filter_by(name=category).first()
     deletedExercise = db_session.query(
