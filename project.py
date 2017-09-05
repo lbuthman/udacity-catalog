@@ -1,5 +1,10 @@
-from flask import (
-    Flask, render_template, request, redirect, url_for, flash, jsonify)
+from flask import (Flask,
+                   render_template,
+                   request,
+                   redirect,
+                   url_for,
+                   flash,
+                   jsonify)
 from flask import session
 from flask import make_response
 from sqlalchemy import create_engine, asc, desc
