@@ -94,17 +94,17 @@ quotes and use that for the YouTube URL.
 
 ## JSON Requests
 
-Sometimes in life, you just got to get your JSON On. AmIRight?! Luckily, we
+Sometimes in life, you just got to get your JSON On. AmIRight?! Luckily, I
 have provided several JSON endpoints for you to use at your pleasure.
 
 1. /categories/JSON/
     -> this will return all the exercise categories and their data
 2. /exercises/JSON/
     -> this will return all the exercises and their data
-3. /<category-name>/exercises/JSON/
+3. /\<category-name\>/exercises/JSON/
     -> this will return data for all the exercises of a specified category
     -> replace <category-name> with the category of your choice
-4. /<category-name>/<exercise-name>/JSON/
+4. /\<category-name\>/\<exercise-name\>/JSON/
     -> this will return the data for a specific exercise
     -> replace <category-name> with the category of your choice and
     <exercise-name> with the exercise of your choice
